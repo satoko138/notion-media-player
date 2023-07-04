@@ -15,7 +15,7 @@ export const LogSetting = {
     },
     "categories" : {
         "default" : {
-            "appenders" : process.env.ENV === 'dev' ? ["file", "console"] : ["file"],
+            "appenders" : process.env.NODE_ENV === 'dev' ? ["file", "console"] : ["file"],
             level : process.env.LOG_LEVEL as string,
         },
     }
