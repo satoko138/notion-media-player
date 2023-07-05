@@ -1,16 +1,27 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { GetMediaListResult, MediaInfo } from '../types/api-types';
+import React, { useRef, useCallback, useEffect, useState } from 'react';
+import { GetMediaListResult, GetMediaPathResult, MediaInfo } from '../types/api-types';
 import { BsFillPlayCircleFill } from 'react-icons/bs';
 import styles from './MediaList.module.scss';
 
 type Props = {
 }
 export default function MediaList(props: Props) {
+    const loadingRef = useRef(false);
     const [ loading, setLoading ] = useState(false);
+    // useEffect(() => {
+    //     loadingRef.current = loading;
+    // }, [loading]);
     const [ medias, setMedias ] = useState<MediaInfo[]>([]);
     const [ nextCursor, setNextCursor ] = useState<string | undefined>();
 
     const onNextLoad = useCallback(async() => {
+        if (loadingRef.current) {
+            // 二重ロード禁止
+            console.log('二重ロード禁止')
+            return;
+        }
+        console.log('load start');
+        loadingRef.current = true;
         setLoading(true);
 
         const param = nextCursor ? '?cursor=' + nextCursor : '';
@@ -22,12 +33,19 @@ export default function MediaList(props: Props) {
         setNextCursor(result.next_cursor);
 
         setLoading(false);
-    }, [nextCursor]);
+        loadingRef.current = false;
+    }, [nextCursor, loading]);
 
 
     // useEfectじゃない方が適切かもしれないけれど、ひとまず
     useEffect(() => {
         onNextLoad();
+    }, []);
+
+    const onPlay = useCallback(async(id: string) => {
+        const res = await fetch('/api/mediapath?id=' + id);
+        const result = await res.json() as GetMediaPathResult;
+        console.log('res', result);
     }, []);
 
     return (
@@ -51,13 +69,16 @@ export default function MediaList(props: Props) {
                         return (
                             <tr key={media.id} className='bg-white border-b dark:bg-gray-800 dark:border-gray-700'>
                                 <td className='px-6 py-3'>
+                                    {media.id}
                                     {media.publish_date}
                                 </td>
                                 <td className='px-6 py-3'>
                                     {media.title}
                                 </td>
                                 <td className='px-6 py-3'>
-                                    <BsFillPlayCircleFill />
+                                    <span className={styles.PlayBtn} onClick={()=>onPlay(media.id)}>
+                                        <BsFillPlayCircleFill />
+                                    </span>
                                 </td>
                             </tr>
                         )

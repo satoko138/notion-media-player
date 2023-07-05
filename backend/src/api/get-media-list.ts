@@ -12,7 +12,6 @@ export async function getMediaList(param: GetMediaListParam): Promise<GetMediaLi
         auth: NotionApiKey,
     });
 
-    console.log('cursor', param.cursor);
     const medias = [] as MediaInfo[];
     const pages = await notion.databases.query({
         database_id: NotionMediaDbId,

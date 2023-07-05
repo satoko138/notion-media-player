@@ -3,7 +3,8 @@ import { configure, getLogger } from 'log4js';
 import { exit } from 'process';
 import { LogSetting } from './config';
 import { getMediaList } from './api/get-media-list';
-import { GetMediaListParam } from './api-types';
+import { GetMediaListParam, GetMediaPathParam } from './api-types';
+import { getMediaPath } from './api/get-media-path';
 
 if (!process.env.NOTION_API_KEY) {
     console.error('NOTION_API_KEY not found');
@@ -28,6 +29,9 @@ const logger = getLogger();
 
 const app = express();
 
+/**
+ * メディア一覧を取得
+ */
 app.get('/api/list', async(req, res) => {
     const param = req.query as GetMediaListParam;
     logger.info('[start] api/list', param);
@@ -35,6 +39,25 @@ app.get('/api/list', async(req, res) => {
     // logger.debug('result', result);
     res.send(result);
     logger.info('[end] api/list')
+})
+
+/**
+ * メディアファイルパスを取得
+ */
+app.get('/api/mediapath', async(req, res) => {
+    try {
+        const param = req.query as GetMediaPathParam;
+        logger.info('[start] api/mediapath', param);
+        const result = await getMediaPath(param);
+        res.send(result);
+    
+    } catch(e) {
+        logger.warn('medipath error', e);
+        res.status(500).send(e);
+
+    } finally {
+        logger.info('[end] api/mediapth');
+    }
 })
 
 app.listen(80, () => {
