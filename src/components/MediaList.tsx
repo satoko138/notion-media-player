@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { GetMediaListResult, MediaInfo } from '../types/api-types';
-import { defaultButton } from '../styles/define';
+import { BsFillPlayCircleFill } from 'react-icons/bs';
+import styles from './MediaList.module.scss';
 
 type Props = {
 }
@@ -31,8 +32,8 @@ export default function MediaList(props: Props) {
 
     return (
         <>
-            <table className='w-full text-base text-left text-gray-500 dark:text-gray-400'>
-                <thead className='text-sm text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400'>
+            <table className={styles.Table}>
+                <thead>
                     <tr>
                         <th className='px-6 py-2'>
                             配信日
@@ -56,7 +57,7 @@ export default function MediaList(props: Props) {
                                     {media.title}
                                 </td>
                                 <td className='px-6 py-3'>
-                                    再生
+                                    <BsFillPlayCircleFill />
                                 </td>
                             </tr>
                         )
@@ -66,7 +67,7 @@ export default function MediaList(props: Props) {
             {loading ?
                 <span>Loading...</span>
                 : nextCursor &&
-                    <button className={defaultButton} onClick={onNextLoad}>続き</button>
+                    <button onClick={onNextLoad}>続き</button>
             }
         </>
     );
