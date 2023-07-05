@@ -1,17 +1,18 @@
 import { Client } from "@notionhq/client";
 import { NotionApiKey, NotionMediaDbId, NotionPublishDatePropertyName } from "..";
 import { QueryDatabaseResponse } from "@notionhq/client/build/src/api-endpoints";
-import { GetMediaListResult, MediaInfo } from "../api-types";
+import { GetMediaListParam, GetMediaListResult, MediaInfo } from "../api-types";
 import { getLogger } from 'log4js';
 
 type NotionPage = QueryDatabaseResponse['results'][0];
 
 const logger = getLogger();
-export async function getMediaList(): Promise<GetMediaListResult> {
+export async function getMediaList(param: GetMediaListParam): Promise<GetMediaListResult> {
     const notion = new Client({
         auth: NotionApiKey,
     });
 
+    console.log('cursor', param.cursor);
     const medias = [] as MediaInfo[];
     const pages = await notion.databases.query({
         database_id: NotionMediaDbId,
@@ -21,8 +22,8 @@ export async function getMediaList(): Promise<GetMediaListResult> {
                 property: NotionPublishDatePropertyName,
                 direction: 'ascending',
             }
-        ]
-        // start_cursor,
+        ],
+        start_cursor: param.cursor,
     });
     const next_cursor = pages.next_cursor ?? undefined;
 

@@ -3,6 +3,7 @@ import { configure, getLogger } from 'log4js';
 import { exit } from 'process';
 import { LogSetting } from './config';
 import { getMediaList } from './api/get-media-list';
+import { GetMediaListParam } from './api-types';
 
 if (!process.env.NOTION_API_KEY) {
     console.error('NOTION_API_KEY not found');
@@ -28,9 +29,10 @@ const logger = getLogger();
 const app = express();
 
 app.get('/api/list', async(req, res) => {
-    logger.info('[start] api/list')
-    const result = await getMediaList();
-    logger.debug('result', result);
+    const param = req.query as GetMediaListParam;
+    logger.info('[start] api/list', param);
+    const result = await getMediaList(param);
+    // logger.debug('result', result);
     res.send(result);
     logger.info('[end] api/list')
 })
