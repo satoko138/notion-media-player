@@ -16,6 +16,12 @@ if (!process.env.NOTION_MEDIA_DB_ID) {
 }
 export const NotionMediaDbId = process.env.NOTION_MEDIA_DB_ID;
 
+if (!process.env.NOTION_PUBLISH_DATE_PROPERTY_NAME) {
+    console.error('NOTION_PUBLISH_DATE_PROPERTY_NAME not found');
+    exit(1);
+}
+export const NotionPublishDatePropertyName = process.env.NOTION_PUBLISH_DATE_PROPERTY_NAME;
+
 configure(LogSetting);
 const logger = getLogger();
 
