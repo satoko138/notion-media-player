@@ -67,12 +67,6 @@ export default function MediaList(props: Props) {
         setConfirm(undefined);
     }, []);
 
-    const onAudioEnded = useCallback(() => {
-        if (!currentIndex) return;
-        // 次を再生する
-        setCurrentIndex(currentIndex+1);
-    }, [currentIndex]);
-
     /**
      * 再生開始
      */
@@ -96,6 +90,12 @@ export default function MediaList(props: Props) {
                 }
                 const result = await res.json() as GetMediaPathResult;
                 audioRef.current.src = result.path;
+
+                const endFunc = () => {
+                    setCurrentIndex(currentIndex+1);
+                    audioRef.current?.removeEventListener('ended', endFunc);
+                }
+                audioRef.current.addEventListener('ended', endFunc);
                 audioRef.current.play();
         
             } catch(e) {
@@ -114,7 +114,7 @@ export default function MediaList(props: Props) {
     return (
         <div className={styles.Container}>
             <div className={styles.Audio}>
-                <audio ref={audioRef} controls onEnded={onAudioEnded}></audio>
+                <audio ref={audioRef} controls></audio>
             </div>
             <div className={styles.Container}>
                 {loading &&
