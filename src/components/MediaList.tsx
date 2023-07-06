@@ -46,42 +46,58 @@ export default function MediaList(props: Props) {
         onNextLoad();
     }, []);
 
-    const onPlay = useCallback(async(index: number) => {
-        if (!audioRef.current) {
-            console.warn('audio not found');
-            return;
-        }
-        setLoading(true);
-        try {
-            const id = medias[index].id;
-            setCurrentIndex(index);
-            const res = await fetch('/api/mediapath?id=' + id);
-            if (!res.ok) {
-                throw new Error(res.statusText);
-            }
-            const result = await res.json() as GetMediaPathResult;
-            audioRef.current.src = result.path;
-            audioRef.current.play();
-    
-        } catch(e) {
-            console.warn(e);
-            setConfirm({
-                message: 'メディアファイルのダウンロードに失敗しました。'
-            });
-
-        } finally {
-            setLoading(false);
-        }
-    }, []);
-
     const onConfirmClose = useCallback(() => {
         setConfirm(undefined);
     }, []);
 
+    const onAudioEnded = useCallback(() => {
+        if (!currentIndex) return;
+        // 次を再生する
+        setCurrentIndex(currentIndex+1);
+    }, [currentIndex]);
+
+    /**
+     * 再生開始
+     */
+    useEffect(() => {
+        if (!currentIndex) return;
+        if (currentIndex >= medias.length) {
+            return;
+        }
+
+        const playFunc = async() => {
+            if (!audioRef.current) {
+                console.warn('audio not found');
+                return;
+            }
+            setLoading(true);
+            try {
+                const id = medias[currentIndex].id;
+                const res = await fetch('/api/mediapath?id=' + id);
+                if (!res.ok) {
+                    throw new Error(res.statusText);
+                }
+                const result = await res.json() as GetMediaPathResult;
+                audioRef.current.src = result.path;
+                audioRef.current.play();
+        
+            } catch(e) {
+                console.warn(e);
+                setConfirm({
+                    message: 'メディアファイルのダウンロードに失敗しました。'
+                });
+    
+            } finally {
+                setLoading(false);
+            }
+        }
+        playFunc();
+    }, [currentIndex, medias]);
+
     return (
         <>
             <div className={styles.Audio}>
-                <audio ref={audioRef} controls></audio>
+                <audio ref={audioRef} controls onEnded={onAudioEnded}></audio>
             </div>
             <div className={styles.Container}>
                 {loading &&
@@ -116,7 +132,7 @@ export default function MediaList(props: Props) {
                                             {media.title}
                                         </td>
                                         <td>
-                                            <span className={styles.PlayBtn} onClick={()=>onPlay(index)}>
+                                            <span className={styles.PlayBtn} onClick={()=> setCurrentIndex(index)}>
                                                 <BsFillPlayCircleFill />
                                             </span>
                                         </td>
