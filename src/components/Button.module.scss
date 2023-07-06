@@ -2,16 +2,36 @@
     display: inline-block;
     padding: 0.4em 1.6em;
     font-size: 0.8rem;
-    color: var(--primary);
-    background-color: #fff;
     text-decoration: none;
     user-select: none;
-    border: 1px var(--primary) solid;
     border-radius: 20px;
     transition: 0.4s ease;
 
     &:hover {
-        color: #fff;
-        background: var(--primary);        
+        box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2), 0 1px 8px 0 rgba(0, 0, 0, 0.12);
     }
+}
+.primary {
+    color: #fff;
+    background: var(--primary);        
+    border: 1px var(--primary) solid;
+
+    &:hover {
+        box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.2), 0 1px 8px 0 rgba(0, 0, 0, 0.12);
+    }
+}
+.outline-primary {
+    color: var(--primary);
+    border: 1px var(--primary) solid;
+    background-color: #fff;
+}
+.secondary {
+    color: #fff;
+    border: 1px var(--secondary) solid;
+    background-color: var(--secondary);
+}
+.outline-secondary {
+    color: var(--secondary);
+    border: 1px var(--secondary) solid;
+    background-color: #fff;
 }

@@ -158,7 +158,7 @@ export default function MediaList(props: Props) {
                         </tbody>
                     </table>
                     {nextCursor &&
-                        <Button onClick={()=>onLoad(nextCursor)}>続き</Button>
+                        <Button type='outline-secondary' onClick={()=>onLoad(nextCursor)}>続き</Button>
                     }
                 </div>
             </div>

@@ -16,11 +16,19 @@ export default function ConditionForm(props: Props) {
         props.onChange(condition)
     }, [props, keyword]);
 
+    const onClear = useCallback(() => {
+        setKeyword('');
+        if (props.onChange) {
+            props.onChange(undefined);
+        }
+    }, [props]);
+
     return (
-        <div>
+        <div className={styles.Container}>
             <input type='text' className={styles.Input}
                 value={keyword} onChange={(evt) => setKeyword(evt.target.value)} />
-            <Button onClick={onSearch}>絞り込み</Button>
+            <Button type='primary' onClick={onSearch}>絞り込み</Button>
+            <Button type='outline-primary' onClick={onClear}>クリア</Button>
         </div>
     );
 }
