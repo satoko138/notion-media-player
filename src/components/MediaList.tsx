@@ -1,9 +1,11 @@
-import React, { useRef, useCallback, useEffect, useState } from 'react';
+import React, { useRef, useCallback, useState } from 'react';
 import { GetMediaListResult, GetMediaPathResult, MediaInfo } from '../types/api-types';
 import { BsFillPlayCircleFill } from 'react-icons/bs';
 import styles from './MediaList.module.scss';
 import Spinner from './Spinner';
 import ConfirmDialog, { ConfirmParam } from './ConfirmDialog';
+import { useWatch } from '../util/useWatch';
+import { useMounted } from '../util/useMounted';
 
 type Props = {
 }
@@ -41,10 +43,9 @@ export default function MediaList(props: Props) {
     }, [nextCursor]);
 
 
-    // useEfectじゃない方が適切かもしれないけれど、ひとまず
-    useEffect(() => {
+    useMounted(() => {
         onNextLoad();
-    }, []);
+    });
 
     const onConfirmClose = useCallback(() => {
         setConfirm(undefined);
@@ -59,7 +60,7 @@ export default function MediaList(props: Props) {
     /**
      * 再生開始
      */
-    useEffect(() => {
+    useWatch(() => {
         if (!currentIndex) return;
         if (currentIndex >= medias.length) {
             return;
@@ -92,7 +93,7 @@ export default function MediaList(props: Props) {
             }
         }
         playFunc();
-    }, [currentIndex, medias]);
+    }, [currentIndex]);
 
     return (
         <>
