@@ -1,5 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import './App.css';
 import MediaList from './components/MediaList';
 import ConditionForm from './components/ConditionForm';
 import { Condition } from './types/common';
