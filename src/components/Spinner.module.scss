@@ -1,0 +1,23 @@
+// https://see-ss.com/posts/p29wgx8uh/loading
+.loading4 {
+    width: 30px;
+    height: 30px;
+    &.min {
+        width: 20px;
+        height: 20px;
+        border: 5px solid var(--white);
+        border-right: 5px solid transparent;
+    }
+
+    margin: 0 auto;
+    border: 5px solid var(--gray);
+    border-right: 5px solid transparent;
+    border-radius: 50%;
+    animation: rotate 1s linear infinite;
+  }
+  
+  @keyframes rotate {
+    100% {
+      transform: rotate(360deg);
+    }
+}

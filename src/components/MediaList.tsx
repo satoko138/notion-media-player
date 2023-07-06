@@ -2,17 +2,16 @@ import React, { useRef, useCallback, useEffect, useState } from 'react';
 import { GetMediaListResult, GetMediaPathResult, MediaInfo } from '../types/api-types';
 import { BsFillPlayCircleFill } from 'react-icons/bs';
 import styles from './MediaList.module.scss';
+import Spinner from './Spinner';
 
 type Props = {
 }
 export default function MediaList(props: Props) {
     const loadingRef = useRef(false);
     const [ loading, setLoading ] = useState(false);
-    // useEffect(() => {
-    //     loadingRef.current = loading;
-    // }, [loading]);
     const [ medias, setMedias ] = useState<MediaInfo[]>([]);
     const [ nextCursor, setNextCursor ] = useState<string | undefined>();
+    const [ audioSrc, setAudioSrc ] = useState<string | undefined>();
 
     const onNextLoad = useCallback(async() => {
         if (loadingRef.current) {
@@ -34,7 +33,7 @@ export default function MediaList(props: Props) {
 
         setLoading(false);
         loadingRef.current = false;
-    }, [nextCursor, loading]);
+    }, [nextCursor]);
 
 
     // useEfectじゃない方が適切かもしれないけれど、ひとまず
@@ -46,50 +45,56 @@ export default function MediaList(props: Props) {
         const res = await fetch('/api/mediapath?id=' + id);
         const result = await res.json() as GetMediaPathResult;
         console.log('res', result);
+        setAudioSrc(result.path);
     }, []);
 
     return (
         <>
-            <table className={styles.Table}>
-                <thead>
-                    <tr>
-                        <th className='px-6 py-2'>
-                            配信日
-                        </th>
-                        <th className='px-6 py-2'>
-                            タイトル
-                        </th>
-                        <th className='px-6 py-2'>
-                            再生
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {medias.map(media => {
-                        return (
-                            <tr key={media.id} className='bg-white border-b dark:bg-gray-800 dark:border-gray-700'>
-                                <td className='px-6 py-3'>
-                                    {media.id}
-                                    {media.publish_date}
-                                </td>
-                                <td className='px-6 py-3'>
-                                    {media.title}
-                                </td>
-                                <td className='px-6 py-3'>
-                                    <span className={styles.PlayBtn} onClick={()=>onPlay(media.id)}>
-                                        <BsFillPlayCircleFill />
-                                    </span>
-                                </td>
-                            </tr>
-                        )
-                    })}
-                </tbody>
-            </table>
-            {loading ?
-                <span>Loading...</span>
-                : nextCursor &&
-                    <button onClick={onNextLoad}>続き</button>
-            }
+            <audio controls src={audioSrc}></audio>
+            <div className={styles.TableArea}>
+                {/* <div className={styles.SpinnerOverlay}>
+                    <Spinner />
+                </div> */}
+                <table className={styles.Table}>
+                    <thead>
+                        <tr>
+                            <th className='px-6 py-2'>
+                                配信日
+                            </th>
+                            <th className='px-6 py-2'>
+                                タイトル
+                            </th>
+                            <th className='px-6 py-2'>
+                                再生
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {medias.map(media => {
+                            return (
+                                <tr key={media.id} className='bg-white border-b dark:bg-gray-800 dark:border-gray-700'>
+                                    <td className='px-6 py-3'>
+                                        {media.publish_date}
+                                    </td>
+                                    <td className='px-6 py-3'>
+                                        {media.title}
+                                    </td>
+                                    <td className='px-6 py-3'>
+                                        <span className={styles.PlayBtn} onClick={()=>onPlay(media.id)}>
+                                            <BsFillPlayCircleFill />
+                                        </span>
+                                    </td>
+                                </tr>
+                            )
+                        })}
+                    </tbody>
+                </table>
+                {loading ?
+                    <span>Loading...</span>
+                    : nextCursor &&
+                        <button onClick={onNextLoad}>続き</button>
+                }
+            </div>
         </>
     );
 }
