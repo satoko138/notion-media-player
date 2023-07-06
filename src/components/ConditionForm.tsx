@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from 'react';
 import Button from './Button';
 import styles from './ConditionForm.module.scss';
-import { Condition } from '../types/api-types';
+import { Condition } from '../types/common';
 
 type Props = {
     onChange?: (condition: Condition | undefined) => void;
@@ -17,10 +17,10 @@ export default function ConditionForm(props: Props) {
     }, [props, keyword]);
 
     return (
-        <form>
+        <div>
             <input type='text' className={styles.Input}
                 value={keyword} onChange={(evt) => setKeyword(evt.target.value)} />
             <Button onClick={onSearch}>絞り込み</Button>
-        </form>
+        </div>
     );
 }

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import './App.css';
 import MediaList from './components/MediaList';
 import ConditionForm from './components/ConditionForm';
-import { Condition } from './types/api-types';
+import { Condition } from './types/common';
 
 function App() {
     const [ condition, setCondition ] = useState<Condition|undefined>();

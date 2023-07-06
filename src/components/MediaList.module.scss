@@ -1,6 +1,10 @@
 $audioHeight: 80px;
 .Audio {
     height: $audioHeight;
+
+    audio {
+        width: 500px;
+    }
 }
 .Container {
     position: relative;

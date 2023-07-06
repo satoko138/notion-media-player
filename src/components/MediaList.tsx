@@ -1,11 +1,12 @@
-import React, { useRef, useCallback, useState, useEffect } from 'react';
-import { Condition, GetMediaListResult, GetMediaPathResult, MediaInfo } from '../types/api-types';
+import React, { useRef, useCallback, useState } from 'react';
+import { GetMediaListResult, GetMediaPathResult, MediaInfo } from '../types/api-types';
 import { BsFillPlayCircleFill } from 'react-icons/bs';
 import styles from './MediaList.module.scss';
 import Spinner from './Spinner';
 import ConfirmDialog, { ConfirmParam } from './ConfirmDialog';
 import { useWatch } from '../util/useWatch';
 import Button from './Button';
+import { Condition } from '../types/common';
 
 type Props = {
     condition?: Condition;
@@ -21,15 +22,15 @@ export default function MediaList(props: Props) {
 
     const [ confirm, setConfirm ] = useState<ConfirmParam|undefined>();
 
-    useEffect(() => {
+    useWatch(() => {
         // 条件変更時は一覧リセットして検索
         setMedias([]);
         setNextCursor(undefined);
 
-        onNextLoad();
+        onLoad();
     }, [props.condition]);
 
-    const onNextLoad = useCallback(async() => {
+    const onLoad = useCallback(async(cursor?: string) => {
         if (loadingRef.current) {
             // 二重ロード禁止
             console.log('二重ロード禁止')
@@ -40,8 +41,8 @@ export default function MediaList(props: Props) {
         setLoading(true);
 
         const paramMap = {} as {[key: string]: string};
-        if (nextCursor) {
-            paramMap['cursor'] = nextCursor;
+        if (cursor) {
+            paramMap['cursor'] = cursor;
         }
         if (props.condition) {
             paramMap['keyword'] = props.condition.keyword;
@@ -49,7 +50,8 @@ export default function MediaList(props: Props) {
         const param = Object.entries(paramMap).map(entry => {
             return entry[0] + '=' + entry[1]
         }).join('&');
-        const res = await fetch('/api/list' + (param.length > 0 ? `?${param}` : ''));
+        const url = '/api/list' + (param.length > 0 ? `?${param}` : '');
+        const res = await fetch(url);
         const result = await res.json() as GetMediaListResult;
         setMedias((state) => {
             return state.concat(result.medias);
@@ -58,7 +60,7 @@ export default function MediaList(props: Props) {
 
         setLoading(false);
         loadingRef.current = false;
-    }, [nextCursor]);
+    }, [props.condition]);
 
     const onConfirmClose = useCallback(() => {
         setConfirm(undefined);
@@ -156,7 +158,7 @@ export default function MediaList(props: Props) {
                         </tbody>
                     </table>
                     {nextCursor &&
-                        <Button onClick={onNextLoad}>続き</Button>
+                        <Button onClick={()=>onLoad(nextCursor)}>続き</Button>
                     }
                 </div>
             </div>

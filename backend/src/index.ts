@@ -6,23 +6,16 @@ import { getMediaList } from './api/get-media-list';
 import { GetMediaListParam, GetMediaPathParam } from './api-types';
 import { getMediaPath } from './api/get-media-path';
 
-if (!process.env.NOTION_API_KEY) {
-    console.error('NOTION_API_KEY not found');
-    exit(1);
-}
-export const NotionApiKey = process.env.NOTION_API_KEY;
-
-if (!process.env.NOTION_MEDIA_DB_ID) {
-    console.error('NOTION_MEDIA_DB_ID not found');
-    exit(1);
-}
-export const NotionMediaDbId = process.env.NOTION_MEDIA_DB_ID;
-
-if (!process.env.NOTION_PUBLISH_DATE_PROPERTY_NAME) {
-    console.error('NOTION_PUBLISH_DATE_PROPERTY_NAME not found');
-    exit(1);
-}
-export const NotionPublishDatePropertyName = process.env.NOTION_PUBLISH_DATE_PROPERTY_NAME;
+['NOTION_API_KEY', 'NOTION_MEDIA_DB_ID', 'NOTION_TITLE_PROPERTY_NAME', 'NOTION_PUBLISH_DATE_PROPERTY_NAME'].forEach(key => {
+    if (!process.env[key]) {
+        console.error(`${key} not found`);
+        exit(1);
+    }    
+})
+export const NotionApiKey = process.env.NOTION_API_KEY as string;
+export const NotionMediaDbId = process.env.NOTION_MEDIA_DB_ID as string;
+export const NotionTitlePropertyName = process.env.NOTION_TITLE_PROPERTY_NAME as string;
+export const NotionPublishDatePropertyName = process.env.NOTION_PUBLISH_DATE_PROPERTY_NAME as string;
 
 configure(LogSetting);
 const logger = getLogger();

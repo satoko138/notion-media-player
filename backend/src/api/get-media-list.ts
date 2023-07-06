@@ -1,5 +1,5 @@
 import { Client } from "@notionhq/client";
-import { NotionApiKey, NotionMediaDbId, NotionPublishDatePropertyName } from "..";
+import { NotionApiKey, NotionMediaDbId, NotionPublishDatePropertyName, NotionTitlePropertyName } from "..";
 import { QueryDatabaseResponse } from "@notionhq/client/build/src/api-endpoints";
 import { GetMediaListParam, GetMediaListResult, MediaInfo } from "../api-types";
 import { getLogger } from 'log4js';
@@ -17,6 +17,12 @@ export async function getMediaList(param: GetMediaListParam): Promise<GetMediaLi
     const pages = await notion.databases.query({
         database_id: NotionMediaDbId,
         page_size: 20,
+        filter: param.keyword ? {
+            property: NotionTitlePropertyName,
+            title: {
+                contains: param.keyword
+            },
+        } : undefined,
         sorts: [
             {
                 property: NotionPublishDatePropertyName,
