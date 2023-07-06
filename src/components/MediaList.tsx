@@ -23,6 +23,7 @@ export default function MediaList(props: Props) {
     const [ confirm, setConfirm ] = useState<ConfirmParam|undefined>();
 
     useWatch(() => {
+        console.log('condition', props.condition);
         // 条件変更時は一覧リセットして検索
         setMedias([]);
         setNextCursor(undefined);
@@ -158,7 +159,7 @@ export default function MediaList(props: Props) {
                         </tbody>
                     </table>
                     {nextCursor &&
-                        <Button type='outline-secondary' onClick={()=>onLoad(nextCursor)}>続き</Button>
+                        <Button type='outline-primary' onClick={()=>onLoad(nextCursor)}>続き</Button>
                     }
                 </div>
             </div>

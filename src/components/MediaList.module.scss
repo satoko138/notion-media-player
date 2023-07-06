@@ -18,6 +18,7 @@ $audioHeight: 80px;
 }
 .Table {
     margin: auto;
+    border-collapse: collapse;
     thead {
         tr {
             position: -webkit-sticky;
@@ -41,13 +42,18 @@ $audioHeight: 80px;
             }
         }
         td {
-            padding: .5rem;
+            padding: .3rem;
         }
     }
 }
 .PlayBtn {
     cursor: pointer;
+    font-size: 150%;
     color: var(--primary);
+
+    &:hover {
+        filter: brightness(1.2);
+    }
 }
 .SpinnerOverlay {
     position: absolute;
