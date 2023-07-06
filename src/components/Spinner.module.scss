@@ -1,23 +1,49 @@
-// https://see-ss.com/posts/p29wgx8uh/loading
-.loading4 {
-    width: 30px;
-    height: 30px;
-    &.min {
-        width: 20px;
-        height: 20px;
-        border: 5px solid var(--white);
-        border-right: 5px solid transparent;
-    }
+.DotPulse {
+  --uib-size: 40px;
+  --uib-speed: 1.3s;
+  --uib-color: var(--primary);
 
-    margin: 0 auto;
-    border: 5px solid var(--gray);
-    border-right: 5px solid transparent;
-    border-radius: 50%;
-    animation: rotate 1s linear infinite;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: var(--uib-size);
+  height: calc(var(--uib-size) * 0.27);
+}
+
+.DotPulseDot,
+.DotPulse::before,
+.DotPulse::after {
+  content: '';
+  display: block;
+  height: calc(var(--uib-size) * 0.18);
+  width: calc(var(--uib-size) * 0.18);
+  border-radius: 50%;
+  background-color: var(--uib-color);
+  transform: scale(0);
+}
+
+.DotPulse::before {
+  animation: pulse var(--uib-speed) ease-in-out infinite;
+}
+
+.DotPulseDot {
+  animation: pulse var(--uib-speed) ease-in-out
+    calc(var(--uib-speed) * 0.125) infinite both;
+}
+
+.DotPulse::after {
+  animation: pulse var(--uib-speed) ease-in-out
+    calc(var(--uib-speed) * 0.25) infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(0);
   }
-  
-  @keyframes rotate {
-    100% {
-      transform: rotate(360deg);
-    }
+
+  50% {
+    transform: scale(1.5);
+  }
 }

@@ -6,6 +6,8 @@ type Props = {
 }
 export default function Spinner(props: Props) {
     return (
-        <div className={`${styles.loading4} ${props.size==='small' ? styles.min : ''}`} />
+        <div className={styles.DotPulse}>
+            <div className={styles.DotPulseDot}></div>
+        </div>
     );
 }

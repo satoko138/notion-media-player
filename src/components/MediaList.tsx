@@ -3,6 +3,7 @@ import { GetMediaListResult, GetMediaPathResult, MediaInfo } from '../types/api-
 import { BsFillPlayCircleFill } from 'react-icons/bs';
 import styles from './MediaList.module.scss';
 import Spinner from './Spinner';
+import ConfirmDialog, { ConfirmParam } from './ConfirmDialog';
 
 type Props = {
 }
@@ -11,7 +12,11 @@ export default function MediaList(props: Props) {
     const [ loading, setLoading ] = useState(false);
     const [ medias, setMedias ] = useState<MediaInfo[]>([]);
     const [ nextCursor, setNextCursor ] = useState<string | undefined>();
-    const [ audioSrc, setAudioSrc ] = useState<string | undefined>();
+    const audioRef = useRef<HTMLAudioElement|null>(null);
+    // 再生中のAudioIndex
+    const [ currentIndex, setCurrentIndex ] = useState<number | undefined>();
+
+    const [ confirm, setConfirm ] = useState<ConfirmParam|undefined>();
 
     const onNextLoad = useCallback(async() => {
         if (loadingRef.current) {
@@ -41,18 +46,43 @@ export default function MediaList(props: Props) {
         onNextLoad();
     }, []);
 
-    const onPlay = useCallback(async(id: string) => {
+    const onPlay = useCallback(async(index: number) => {
+        if (!audioRef.current) {
+            console.warn('audio not found');
+            return;
+        }
         setLoading(true);
-        const res = await fetch('/api/mediapath?id=' + id);
-        const result = await res.json() as GetMediaPathResult;
-        console.log('res', result);
-        setAudioSrc(result.path);
-        setLoading(false);
+        try {
+            const id = medias[index].id;
+            setCurrentIndex(index);
+            const res = await fetch('/api/mediapath?id=' + id);
+            if (!res.ok) {
+                throw new Error(res.statusText);
+            }
+            const result = await res.json() as GetMediaPathResult;
+            audioRef.current.src = result.path;
+            audioRef.current.play();
+    
+        } catch(e) {
+            console.warn(e);
+            setConfirm({
+                message: 'メディアファイルのダウンロードに失敗しました。'
+            });
+
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    const onConfirmClose = useCallback(() => {
+        setConfirm(undefined);
     }, []);
 
     return (
         <>
-            <audio controls src={audioSrc}></audio>
+            <div className={styles.Audio}>
+                <audio ref={audioRef} controls></audio>
+            </div>
             <div className={styles.Container}>
                 {loading &&
                     <div className={styles.SpinnerOverlay}>
@@ -75,9 +105,10 @@ export default function MediaList(props: Props) {
                             </tr>
                         </thead>
                         <tbody>
-                            {medias.map(media => {
+                            {medias.map((media, index) => {
                                 return (
-                                    <tr key={media.id} className='bg-white border-b dark:bg-gray-800 dark:border-gray-700'>
+                                    <tr key={media.id}
+                                        className={index===currentIndex ? styles.Current : ''}>
                                         <td>
                                             {media.publish_date}
                                         </td>
@@ -85,7 +116,7 @@ export default function MediaList(props: Props) {
                                             {media.title}
                                         </td>
                                         <td>
-                                            <span className={styles.PlayBtn} onClick={()=>onPlay(media.id)}>
+                                            <span className={styles.PlayBtn} onClick={()=>onPlay(index)}>
                                                 <BsFillPlayCircleFill />
                                             </span>
                                         </td>
@@ -99,6 +130,7 @@ export default function MediaList(props: Props) {
                     }
                 </div>
             </div>
+            <ConfirmDialog show={confirm!==undefined} {...confirm} onClose={onConfirmClose} />
         </>
     );
 }

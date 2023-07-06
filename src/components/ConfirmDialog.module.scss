@@ -1,0 +1,21 @@
+.Dialog {
+    padding: 0;
+    border: 1px solid var(--gray);
+    border-radius: 0.5rem;
+
+    &:focus {
+        outline: none;
+    }
+}
+.Header {
+    padding: 3px 10px;
+    font-size: 120%;
+    text-align: right;
+
+    .Close {
+        cursor: pointer;
+    }
+}
+.Body {
+    padding: 1rem;
+}
