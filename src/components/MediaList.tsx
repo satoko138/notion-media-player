@@ -1,13 +1,14 @@
-import React, { useRef, useCallback, useState } from 'react';
-import { GetMediaListResult, GetMediaPathResult, MediaInfo } from '../types/api-types';
+import React, { useRef, useCallback, useState, useEffect } from 'react';
+import { Condition, GetMediaListResult, GetMediaPathResult, MediaInfo } from '../types/api-types';
 import { BsFillPlayCircleFill } from 'react-icons/bs';
 import styles from './MediaList.module.scss';
 import Spinner from './Spinner';
 import ConfirmDialog, { ConfirmParam } from './ConfirmDialog';
 import { useWatch } from '../util/useWatch';
-import { useMounted } from '../util/useMounted';
+import Button from './Button';
 
 type Props = {
+    condition?: Condition;
 }
 export default function MediaList(props: Props) {
     const loadingRef = useRef(false);
@@ -20,6 +21,14 @@ export default function MediaList(props: Props) {
 
     const [ confirm, setConfirm ] = useState<ConfirmParam|undefined>();
 
+    useEffect(() => {
+        // 条件変更時は一覧リセットして検索
+        setMedias([]);
+        setNextCursor(undefined);
+
+        onNextLoad();
+    }, [props.condition]);
+
     const onNextLoad = useCallback(async() => {
         if (loadingRef.current) {
             // 二重ロード禁止
@@ -30,8 +39,17 @@ export default function MediaList(props: Props) {
         loadingRef.current = true;
         setLoading(true);
 
-        const param = nextCursor ? '?cursor=' + nextCursor : '';
-        const res = await fetch('/api/list' + param);
+        const paramMap = {} as {[key: string]: string};
+        if (nextCursor) {
+            paramMap['cursor'] = nextCursor;
+        }
+        if (props.condition) {
+            paramMap['keyword'] = props.condition.keyword;
+        }
+        const param = Object.entries(paramMap).map(entry => {
+            return entry[0] + '=' + entry[1]
+        }).join('&');
+        const res = await fetch('/api/list' + (param.length > 0 ? `?${param}` : ''));
         const result = await res.json() as GetMediaListResult;
         setMedias((state) => {
             return state.concat(result.medias);
@@ -41,11 +59,6 @@ export default function MediaList(props: Props) {
         setLoading(false);
         loadingRef.current = false;
     }, [nextCursor]);
-
-
-    useMounted(() => {
-        onNextLoad();
-    });
 
     const onConfirmClose = useCallback(() => {
         setConfirm(undefined);
@@ -143,7 +156,7 @@ export default function MediaList(props: Props) {
                         </tbody>
                     </table>
                     {nextCursor &&
-                        <button className={styles.Button} onClick={onNextLoad}>続き</button>
+                        <Button onClick={onNextLoad}>続き</Button>
                     }
                 </div>
             </div>

@@ -29,7 +29,7 @@ export default function ConfirmDialog(props: Props) {
         if (props.onClose)
             props.onClose();
 
-    }, [])
+    }, [props])
 
     return (
         <dialog ref={myRef} className={styles.Dialog}>

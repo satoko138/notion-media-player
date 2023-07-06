@@ -3,8 +3,11 @@ export type MediaInfo = {
     title: string;
     publish_date: string;
 }
-
+export type Condition = {
+    keyword: string;
+}
 export type GetMediaListParam = {
+    condition?: Condition;
     cursor?: string;
 }
 

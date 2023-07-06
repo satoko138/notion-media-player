@@ -1,0 +1,17 @@
+.Button {
+    display: inline-block;
+    padding: 0.4em 1.6em;
+    font-size: 0.8rem;
+    color: var(--primary);
+    background-color: #fff;
+    text-decoration: none;
+    user-select: none;
+    border: 1px var(--primary) solid;
+    border-radius: 20px;
+    transition: 0.4s ease;
+
+    &:hover {
+        color: #fff;
+        background: var(--primary);        
+    }
+}
