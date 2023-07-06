@@ -8,7 +8,7 @@ import { useMounted } from './util/useMounted';
 import styles from './App.module.scss';
 
 function App() {
-    const [ searchParams, setSearchParams ] = useSearchParams();
+    const [ searchParams ] = useSearchParams();
     const [ condition, setCondition ] = useState<Condition|undefined>();
     const [ initialized, setInitialized ] = useState(false);
 
@@ -21,7 +21,6 @@ function App() {
             })
         }
         setInitialized(true);
-        console.log('mounted', keyword);
     });
 
     const showCondition = useMemo(() => {

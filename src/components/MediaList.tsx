@@ -77,7 +77,7 @@ export default function MediaList(props: Props) {
      * 再生開始
      */
     useWatch(() => {
-        if (!currentIndex) return;
+        if (currentIndex===undefined) return;
         if (currentIndex >= medias.length) {
             return;
         }

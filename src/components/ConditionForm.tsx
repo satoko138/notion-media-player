@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback } from 'react';
 import Button from './Button';
 import styles from './ConditionForm.module.scss';
 import { Condition } from '../types/common';
