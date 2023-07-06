@@ -1,6 +1,6 @@
 import { Client } from "@notionhq/client";
-import { NotionApiKey, NotionMediaDbId, NotionPublishDatePropertyName, NotionTitlePropertyName } from "..";
-import { QueryDatabaseResponse } from "@notionhq/client/build/src/api-endpoints";
+import { NotionApiKey, NotionMediaDbId, NotionSortPropertyName, NotionTitlePropertyName } from "..";
+import { QueryDatabaseParameters, QueryDatabaseResponse } from "@notionhq/client/build/src/api-endpoints";
 import { GetMediaListParam, GetMediaListResult, MediaInfo } from "../api-types";
 import { getLogger } from 'log4js';
 import dayjs from "dayjs";
@@ -8,24 +8,40 @@ import dayjs from "dayjs";
 type NotionPage = QueryDatabaseResponse['results'][0];
 
 const logger = getLogger();
+type Filter = QueryDatabaseParameters['filter'];
 export async function getMediaList(param: GetMediaListParam): Promise<GetMediaListResult> {
     const notion = new Client({
         auth: NotionApiKey,
     });
 
-    const medias = [] as MediaInfo[];
-    const pages = await notion.databases.query({
-        database_id: NotionMediaDbId,
-        page_size: 20,
-        filter: param.keyword ? {
+    const filter: Filter = {
+        and: []
+    };
+    if (param.keyword) {
+        filter.and.push({
             property: NotionTitlePropertyName,
             title: {
                 contains: param.keyword
             },
-        } : undefined,
+        })
+    }
+    if (process.env.NOTION_PUBLISH_FLAG_PROPERTY_NAME) {
+        filter.and.push({
+            property: process.env.NOTION_PUBLISH_FLAG_PROPERTY_NAME,
+            checkbox: {
+                equals: true,
+            }
+        })
+    }
+    
+    const medias = [] as MediaInfo[];
+    const pages = await notion.databases.query({
+        database_id: NotionMediaDbId,
+        page_size: 20,
+        filter: filter.and.length > 0 ? filter : undefined,
         sorts: [
             {
-                property: NotionPublishDatePropertyName,
+                property: NotionSortPropertyName,
                 direction: 'ascending',
             }
         ],
@@ -62,7 +78,7 @@ async function getNotionPageInfo(page: NotionPage): Promise<MediaInfo | undefine
         if (property.type === 'title') {
             result.title = property.title.map(val => val.plain_text).join('');
 
-        } else if (property.type === 'date' && propName === NotionPublishDatePropertyName) {
+        } else if (property.type === 'date' && propName === NotionSortPropertyName) {
             if (property.date?.start) {
                 result.publish_date = dayjs(property.date.start).format('YYYY-MM-DD');
             }
