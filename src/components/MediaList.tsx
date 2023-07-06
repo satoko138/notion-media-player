@@ -42,58 +42,62 @@ export default function MediaList(props: Props) {
     }, []);
 
     const onPlay = useCallback(async(id: string) => {
+        setLoading(true);
         const res = await fetch('/api/mediapath?id=' + id);
         const result = await res.json() as GetMediaPathResult;
         console.log('res', result);
         setAudioSrc(result.path);
+        setLoading(false);
     }, []);
 
     return (
         <>
             <audio controls src={audioSrc}></audio>
-            <div className={styles.TableArea}>
-                {/* <div className={styles.SpinnerOverlay}>
-                    <Spinner />
-                </div> */}
-                <table className={styles.Table}>
-                    <thead>
-                        <tr>
-                            <th className='px-6 py-2'>
-                                配信日
-                            </th>
-                            <th className='px-6 py-2'>
-                                タイトル
-                            </th>
-                            <th className='px-6 py-2'>
-                                再生
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {medias.map(media => {
-                            return (
-                                <tr key={media.id} className='bg-white border-b dark:bg-gray-800 dark:border-gray-700'>
-                                    <td className='px-6 py-3'>
-                                        {media.publish_date}
-                                    </td>
-                                    <td className='px-6 py-3'>
-                                        {media.title}
-                                    </td>
-                                    <td className='px-6 py-3'>
-                                        <span className={styles.PlayBtn} onClick={()=>onPlay(media.id)}>
-                                            <BsFillPlayCircleFill />
-                                        </span>
-                                    </td>
-                                </tr>
-                            )
-                        })}
-                    </tbody>
-                </table>
-                {loading ?
-                    <span>Loading...</span>
-                    : nextCursor &&
-                        <button onClick={onNextLoad}>続き</button>
+            <div className={styles.Container}>
+                {loading &&
+                    <div className={styles.SpinnerOverlay}>
+                        <Spinner />
+                    </div>
                 }
+                <div className={styles.TableArea}>
+                    <table className={styles.Table}>
+                        <thead>
+                            <tr>
+                                <th>
+                                    配信日
+                                </th>
+                                <th className={styles.Title}>
+                                    タイトル
+                                </th>
+                                <th>
+                                    再生
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {medias.map(media => {
+                                return (
+                                    <tr key={media.id} className='bg-white border-b dark:bg-gray-800 dark:border-gray-700'>
+                                        <td>
+                                            {media.publish_date}
+                                        </td>
+                                        <td>
+                                            {media.title}
+                                        </td>
+                                        <td>
+                                            <span className={styles.PlayBtn} onClick={()=>onPlay(media.id)}>
+                                                <BsFillPlayCircleFill />
+                                            </span>
+                                        </td>
+                                    </tr>
+                                )
+                            })}
+                        </tbody>
+                    </table>
+                    {nextCursor &&
+                        <button className={styles.Button} onClick={onNextLoad}>続き</button>
+                    }
+                </div>
             </div>
         </>
     );
