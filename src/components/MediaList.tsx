@@ -112,7 +112,7 @@ export default function MediaList(props: Props) {
     }, [currentIndex]);
 
     return (
-        <>
+        <div className={styles.Container}>
             <div className={styles.Audio}>
                 <audio ref={audioRef} controls onEnded={onAudioEnded}></audio>
             </div>
@@ -159,11 +159,13 @@ export default function MediaList(props: Props) {
                         </tbody>
                     </table>
                     {nextCursor &&
-                        <Button type='outline-primary' onClick={()=>onLoad(nextCursor)}>続き</Button>
+                        <div className={styles.NextButtonArea}>
+                            <Button type='outline-primary' onClick={()=>onLoad(nextCursor)}>続き</Button>
+                        </div>
                     }
                 </div>
             </div>
             <ConfirmDialog show={confirm!==undefined} {...confirm} onClose={onConfirmClose} />
-        </>
+        </div>
     );
 }

@@ -1,6 +1,23 @@
 .Container {
+    margin: auto;
+}
+.ConditionForm {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+
     > * {
         margin: 5px;
+    }
+}
+.UrlArea {
+    display: flex;
+    justify-content: center;
+
+    margin: 5px;
+    input {
+        width: 30rem;
+        margin-left: .5rem;
     }
 }
 .Input {

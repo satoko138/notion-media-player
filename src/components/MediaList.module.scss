@@ -1,6 +1,12 @@
 $audioHeight: 80px;
+.Container {
+    margin: auto;
+}
 .Audio {
     height: $audioHeight;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     audio {
         width: 500px;
@@ -13,7 +19,7 @@ $audioHeight: 80px;
 .TableArea {
     position: relative;
     min-height: 10rem;
-    max-height: calc(100vh - $audioHeight);
+    max-height: calc(100% - $audioHeight);
     overflow: auto;
 }
 .Table {
@@ -42,7 +48,7 @@ $audioHeight: 80px;
             }
         }
         td {
-            padding: .3rem;
+            padding: .3rem .8rem;
         }
     }
 }
@@ -54,6 +60,9 @@ $audioHeight: 80px;
     &:hover {
         filter: brightness(1.2);
     }
+}
+.NextButtonArea {
+    text-align: center;
 }
 .SpinnerOverlay {
     position: absolute;

@@ -5,6 +5,7 @@ import ConditionForm from './components/ConditionForm';
 import { Condition } from './types/common';
 import { useSearchParams } from 'react-router-dom';
 import { useMounted } from './util/useMounted';
+import styles from './App.module.scss';
 
 function App() {
     const [ searchParams, setSearchParams ] = useSearchParams();
@@ -34,9 +35,11 @@ function App() {
     }
 
     return (
-        <div className="App">
+        <div className={styles.App}>
             {showCondition &&
-                <ConditionForm onChange={(condition) => setCondition(condition)} />
+                <div className={styles.ConditionArea}>
+                    <ConditionForm onChange={(condition) => setCondition(condition)} />
+                </div>
             }
             <MediaList condition={condition} />
         </div>
