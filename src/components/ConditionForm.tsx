@@ -31,6 +31,15 @@ export default function ConditionForm(props: Props) {
         }
     }, [props]);
 
+    const [ showCopied, setShowCopied ] = useState(false);
+    const onCopyToClipboard = useCallback(() => {
+        navigator.clipboard.writeText(url);
+        setShowCopied(true);
+        setTimeout(() => {
+            setShowCopied(false);
+        }, 1000);
+    }, [url]);
+
     return (
         <div className={styles.Container}>
             <div className={styles.ConditionForm}>
@@ -44,6 +53,11 @@ export default function ConditionForm(props: Props) {
                     URL
                     <input type='text' readOnly className={styles.Input} value={url} />
                 </label>
+                {showCopied ?
+                    <span>Copied</span>
+                    :
+                    <Button type='outline-primary' onClick={onCopyToClipboard}>Copy</Button>
+                }
             </div>
         </div>
     );
