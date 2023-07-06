@@ -3,6 +3,7 @@ import { NotionApiKey, NotionMediaDbId, NotionPublishDatePropertyName } from "..
 import { QueryDatabaseResponse } from "@notionhq/client/build/src/api-endpoints";
 import { GetMediaListParam, GetMediaListResult, MediaInfo } from "../api-types";
 import { getLogger } from 'log4js';
+import dayjs from "dayjs";
 
 type NotionPage = QueryDatabaseResponse['results'][0];
 
@@ -56,7 +57,9 @@ async function getNotionPageInfo(page: NotionPage): Promise<MediaInfo | undefine
             result.title = property.title.map(val => val.plain_text).join('');
 
         } else if (property.type === 'date' && propName === NotionPublishDatePropertyName) {
-            result.publish_date = property.date?.start ?? '';
+            if (property.date?.start) {
+                result.publish_date = dayjs(property.date.start).format('YYYY-MM-DD');
+            }
         }
     })
     return result;
