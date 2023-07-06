@@ -22,6 +22,12 @@ const logger = getLogger();
 
 const app = express();
 
+// フロントエンド資源
+// 本番では./htdocs、開発環境では../buildを参照する
+const static_path = process.env.NODE_ENV === 'dev' ? '../build' : './htdocs';
+logger.info('static path', static_path);
+app.use(express.static(static_path));
+
 /**
  * メディア一覧を取得
  */
