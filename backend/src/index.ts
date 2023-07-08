@@ -32,12 +32,20 @@ app.use(express.static(static_path));
  * メディア一覧を取得
  */
 app.get('/api/list', async(req, res) => {
-    const param = req.query as GetMediaListParam;
-    logger.info('[start] api/list', param);
-    const result = await getMediaList(param);
-    // logger.debug('result', result);
-    res.send(result);
-    logger.info('[end] api/list')
+    try {
+        const param = req.query as GetMediaListParam;
+        logger.info('[start] api/list', param);
+        const result = await getMediaList(param);
+        // logger.debug('result', result);
+        res.send(result);
+
+    } catch(e) {
+        logger.warn('list error', e);
+        res.status(500).send(e);
+
+    } finally {
+        logger.info('[end] api/list')
+    }
 })
 
 /**
