@@ -52,7 +52,7 @@ export default function MediaList(props: Props) {
             return entry[0] + '=' + entry[1]
         }).join('&');
         const url = '/api/list' + (param.length > 0 ? `?${param}` : '');
-        const res = await fetch(url);
+        const res = await fetch(encodeURI(url));
         const result = await res.json() as GetMediaListResult;
         setMedias((state) => {
             return state.concat(result.medias);

@@ -17,7 +17,8 @@ export default function ConditionForm(props: Props) {
         props.onChange(condition);
 
         if (condition) {
-            setUrl(`${document.location.protocol}//${document.location.host}?keyword=${keyword}`);
+            const url = `${document.location.protocol}//${document.location.host}?keyword=${keyword}`;
+            setUrl(encodeURI(url));
 
         } else {
             setUrl('');
