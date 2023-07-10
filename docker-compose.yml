@@ -2,9 +2,9 @@
 version: "3"
 services:
   main:
-    image: nmp:latest
+    image: notion-media-player:latest
     env_file:
-      - ./.env.demo
+      - ./backend/.env.dev
     ports: 
         - 80:80
     volumes:

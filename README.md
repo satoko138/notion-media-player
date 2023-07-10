@@ -1,46 +1,114 @@
-# Getting Started with Create React App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# ![Logo](./public/logo.svg) Notion Media Player
+![My Skills](https://skillicons.dev/icons?i=ts,react,express)
 
-## Available Scripts
+Notionで管理しているaudioファイルを連続再生するシステムです。
 
-In the project directory, you can run:
+とあるところで、audioファイルを貼り付けたNotionページを特定の人達に公開して共有する運用を行っていたのですが、
+「これらを連続再生させたいね」というニーズが出てきたために作りました。
 
-### `npm start`
+サンプル動作環境 → https://notion-media-player.satocheeen.com/  
+使用方法 → https://satocheeen.com/resume/notion-media-player/
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## 事前準備
+### Notionデータベース作成
+1. Notionでaudioファイルを管理するデータベースを用意する。  
+  audioファイルは以下のようにページ内に貼り付ける。
+  ![Notionページサンプル](documents/notion2.png)
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+2. URLを参照して、データベースのIDをメモしておく。
+  ![NotionデータベースURL](documents/notion3.png)
 
-### `npm test`
+### Notionインテグレーション作成
+1. NtoionAPIを操作するためのインテグレーションを発行する。  
+   https://www.notion.so/my-integrations
+2. Secretsキーをコピーする
+  ![Secretsキーをコピー](documents/notion1.png)
+3. インテグレーションにNotionデータベースへの参照権限を付与する。
+  1. Notionデータベースの右上の「…」をクリック
+    ![Click Setting](documents/notion4.png)
+  2. Add connectionsをクリックして、作成したインテグレーションを選択する。
+    ![Add connections](documents/notion5.png)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+NotionAPIに関する情報は、ググれば色々出てくるので、わからないことがあったら適当にググってください。
 
-### `npm run build`
+## サービス構築
+Docker Hubにビルドイメージを置いているので、Docker環境のあるサーバ上でコンテナを起動すればサービス構築できます。
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+docker-compose.yml
+```yaml
+version: "3"
+services:
+  main:
+    image: satocheeen/notion-media-player:1.0.0
+    env_file:
+      - ./.env
+    ports: 
+        - [port]:80
+    volumes:
+        - [log folder path]:/var/log/www
+```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- イメージバージョンは、以下Docker Hubを確認してください。
+  https://hub.docker.com/repository/docker/satocheeen/notion-media-player
+- .envは[環境変数の設定](#環境変数の設定)を参考にして作成してください。
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
+## 開発環境構築
+修正したい場合は、`git clone`して、以下手順を実施。
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+### 環境変数の設定
+1. .env.sampleをコピーして、.env.devを作成する。
+    ```
+    cd backend
+    cp .env.sample .env.dev
+    ```
+2. 各項目に値を設定する
+    |  環境変数名  |  設定値  |
+    | ---- | ---- |
+    | NOTION_API_KEY | [Notionインテグレーション作成](#notionインテグレーション作成)で取得したNotionインテグレーションのSecretsキー |
+    | NOTION_MEDIA_DB_ID | [Notionデータベース作成](#notionデータベース作成)で取得したデータベースID |
+    | NOTION_TITLE_PROPERTY_NAME | タイトルとして使用するプロパティ名 |
+    | NOTION_SORT_PROPERTY_NAME | 一覧のソートとして用いるプロパティ名 |
+    | NOTION_PUBLISH_FLAG_PROPERTY_NAME | Checkboxプロパティ名。Checkboxにチェックがついている項目のみ一覧に表示されます。任意項目。 |
+    | LOG_LEVEL | ログ出力レベル。debug, info, warn等。詳細は、[log4js](https://stritti.github.io/log4js/docu/users-guide.html#configuration)参照 |
+    | LOG_DIR_PATH | ログ出力先フォルダパス |
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### 開発サーバー起動
+1. start backend server
+   ```
+   cd backend
+   npm i
+   npm run dev
+   ```
+2. start frontend
+   ```
+   npm i
+   npm start
+   ```
+3. open http://localhost:3000/ in your browser.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+## デプロイ
+ソースコードを修正した場合は、以下手順でデプロイする。
+1. Dockerイメージ作成
+    1. make a Dcoker image
+        ```
+        docker image build -t notion-media-player .
+        ```
+    2. operation check
+        ```
+        docker-compose up -d
+        ```
+        open http://localhost/ in your browser.
+    3. push the Docker image
+        ```
+        docker image tag notion-media-player xxxx/xxxx:X.X.X
+        docker push xxxx/xxxx:X.X.X
+        ```
+2. Dockerコンテナ起動  
+   [サービス構築](#サービス構築)参照。
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## Copyright
+Copyright (c) 2023 [Satocheeen.com](https://satocheeeen.com)
 
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
+Released under the MIT license
