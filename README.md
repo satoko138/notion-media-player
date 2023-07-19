@@ -7,6 +7,9 @@ Notionで管理しているaudioファイルを連続再生するシステムで
 とあるところで、audioファイルを貼り付けたNotionページを特定の人達に公開して共有する運用を行っていたのですが、
 「これらを連続再生させたいね」というニーズが出てきたために作りました。
 
+  ![サンプル](documents/notion6.png)
+
+
 サンプル動作環境 → https://notion-media-player.satocheeen.com/  
 使用方法 → https://satocheeen.com/resume/notion-media-player/
 
