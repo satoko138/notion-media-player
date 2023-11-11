@@ -17,19 +17,22 @@ export default function MediaList(props: Props) {
     const [ medias, setMedias ] = useState<MediaInfo[]>([]);
     const [ nextCursor, setNextCursor ] = useState<string | undefined>();
     const audioRef = useRef<HTMLAudioElement|null>(null);
+    const audioAreaRef = useRef<HTMLDivElement|null>(null);
     // 再生中のAudioIndex
     const [ currentIndex, setCurrentIndex ] = useState<number | undefined>();
 
     const [ confirm, setConfirm ] = useState<ConfirmParam|undefined>();
 
-    useWatch(() => {
+    const [ isAudioCreated, setAudioCreated ] = useState(false);
+
+    useWatch(props.condition, () => {
         console.log('condition', props.condition);
         // 条件変更時は一覧リセットして検索
         setMedias([]);
         setNextCursor(undefined);
 
         onLoad();
-    }, [props.condition]);
+    }, { immediate: true });
 
     const onLoad = useCallback(async(cursor?: string) => {
         if (loadingRef.current) {
@@ -67,10 +70,23 @@ export default function MediaList(props: Props) {
         setConfirm(undefined);
     }, []);
 
+    const handlePlay = useCallback((evt: React.MouseEvent, index: number) => {
+        if (audioRef.current === null) {
+            // ブラウザによってはユーザイベントを契機にして生成されたaudioでないと自動再生できないので
+            // ここで動的にaudioを生成
+            const audio = new Audio();
+            audio.controls = true;
+            audioAreaRef.current?.append(audio);
+            audioRef.current = audio;
+            setAudioCreated(true);
+        }
+        setCurrentIndex(index);
+    }, []);
+
     /**
      * 再生開始
      */
-    useWatch(() => {
+    useWatch(currentIndex, () => {
         if (currentIndex===undefined) return;
         if (currentIndex >= medias.length) {
             return;
@@ -109,12 +125,14 @@ export default function MediaList(props: Props) {
             }
         }
         playFunc();
-    }, [currentIndex]);
+    });
 
     return (
         <div className={styles.Container}>
-            <div className={styles.Audio}>
-                <audio ref={audioRef} controls></audio>
+            <div className={styles.Audio} ref={audioAreaRef}>
+                {!isAudioCreated &&
+                    <audio controls></audio>
+                }
             </div>
             <div className={styles.Container}>
                 {loading &&
@@ -149,7 +167,7 @@ export default function MediaList(props: Props) {
                                             {media.title}
                                         </td>
                                         <td>
-                                            <span className={styles.PlayBtn} onClick={()=> setCurrentIndex(index)}>
+                                            <span className={styles.PlayBtn} onClick={(evt)=> handlePlay(evt, index)}>
                                                 <BsFillPlayCircleFill />
                                             </span>
                                         </td>

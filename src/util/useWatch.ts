@@ -1,11 +1,36 @@
-import { useEffect, DependencyList } from 'react';
+import { useEffect, useRef } from "react";
 
+type Options = {
+    immediate?: boolean;
+}
 /**
- * 指定した値が変更した際のフック。
- * useEffectは用途が多いので、明示的にフックを用意することで、
- * 使用目的を明確にしている。
+ * 指定のリアクティブな値の変更を検知して、変更時にコールバックするカスタムフック
+ * @param reactiveVal 変更検知する値
+ * @param callback 変更時コールバック
  */
-export function useWatch(process: () => void, deps: DependencyList) {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(process, deps);
+export function useWatch<T>(reactiveVal: T, callback: (oldVal: T, newVal: T) => void, options?: Options) {
+    const prevVal = useRef(structuredClone(reactiveVal));
+    const immediateDoneRef = useRef(options?.immediate ? false : true);
+
+    useEffect(() => {
+        const isChange = function() {
+            if (!immediateDoneRef.current) {
+                // 初回実行する場合
+                immediateDoneRef.current = true;
+                return true;
+            }
+            if (typeof reactiveVal === 'object') {
+                return JSON.stringify(reactiveVal) !== JSON.stringify(prevVal.current);
+            } else {
+                return reactiveVal !== prevVal.current;
+            }
+        }();
+    
+        if (isChange) {
+            const newVal = structuredClone(reactiveVal)
+            callback(prevVal.current, newVal);
+            prevVal.current = newVal;
+        }
+    }, [reactiveVal, callback])
+
 }
